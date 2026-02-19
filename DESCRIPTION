@@ -1,0 +1,35 @@
+Package: crossfit
+Title: Cross-Fitting Engine for Double/Debiased Machine Learning
+Version: 0.1.1
+Authors@R: 
+    person("Etienne", "Peyrot",
+           email = "etienne.peyrot@inserm.fr",
+           role = c("aut", "cre"),
+	   comment = c(ORCID = "0009-0006-8520-6201")
+    )
+Description: Provides a general cross-fitting engine for double /
+    debiased machine learning and other meta-learners. The core
+    functions implement flexible graphs of nuisance models with
+    per-node training fold widths, target-specific evaluation
+    windows, and several fold allocation schemes ("independence",
+    "overlap", "disjoint"). The engine supports both numeric
+    estimators (mode = "estimate") and cross-fitted prediction
+    functions (mode = "predict"), with configurable aggregation
+    over panels and repetitions.
+License: GPL-3
+URL: https://github.com/EtiennePeyrot/crossfit-R
+BugReports: https://github.com/EtiennePeyrot/crossfit-R/issues
+Encoding: UTF-8
+RoxygenNote: 7.3.1
+Depends: R (>= 4.1.0)
+Imports: stats, utils
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2026-02-16 15:52:07 UTC; skoua
+Author: Etienne Peyrot [aut, cre] (ORCID:
+    <https://orcid.org/0009-0006-8520-6201>)
+Maintainer: Etienne Peyrot <etienne.peyrot@inserm.fr>
+Repository: CRAN
+Date/Publication: 2026-02-19 20:00:08 UTC
