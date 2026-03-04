@@ -1,13 +1,13 @@
-dffe508368d8376136cda8db6a604a1f *DESCRIPTION
+eb15b50488f0dcc368fbe635e35f0a10 *DESCRIPTION
 9f3d97019e8f78053cee654bdf39a0c2 *NAMESPACE
-171dc0a9189268b3208f5365a4ef962e *NEWS.md
+cc934a6aec092d4656b917fad5456d0b *NEWS.md
 347e2a5ec54b27198e7a347bcbed3f49 *R/crossfit-package.R
-96fa9f6a45b172377be8e5ee711a103c *R/engine.R
+e73d7fdf60b0fc5614c836c3ca17df8b *R/engine.R
 fa954c27faf7a54cd497e6ee95b14b39 *R/helpers.R
 3b0a47e6d9ac3387b961d3aa58378565 *R/plan.R
 1e2ca971cc7baf712ce937562c2cc37e *R/validation.R
-77cf1d16d50742a91f8923c8022534d5 *README.md
-a84dd57c67a2d43f87ea5c775939db09 *build/vignette.rds
+538db90cc1daad66d90ca88674761d59 *README.md
+53c2f48364e20a41c742737dc48f2dab *build/vignette.rds
 b013ad23fd69aaef2fca27cd84915ba8 *inst/doc/crossfit-intro.R
 f25d21e715bb3f7fc5e5084fef2cc8c8 *inst/doc/crossfit-intro.Rmd
 bc055ba108fa695e6632b55504ab6a9a *inst/doc/crossfit-intro.html
@@ -17,7 +17,7 @@ ee340f708819e753844cc7684556c814 *man/build_instances.Rd
 79559eec664a251880f0c5f3fe2d10fa *man/create_method.Rd
 a1006efec4652d4757c6ddecebb26512 *man/create_nuisance.Rd
 eec9b06cb6c60807afd88270d9a7e1cc *man/crossfit-package.Rd
-59d7efb960bfdbe340ee6f2c21ffb014 *man/crossfit.Rd
+b071ae4b7cdc91d126dcac9e05963dd5 *man/crossfit.Rd
 d9c989f3a2b78010d4395aa0e2e32020 *man/crossfit_multi.Rd
 6551972bd22b9884e0fbf6d47e97d479 *man/ensure_model.Rd
 17456814c71a189d6fb8a4347b378da8 *man/fun_code_sig.Rd
