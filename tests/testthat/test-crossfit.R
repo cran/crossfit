@@ -102,18 +102,17 @@ test_that("crossfit works on a simple regression problem", {
   res <- crossfit(dat, method)
 
   expect_type(res, "list")
-  expect_equal(length(res$estimates), 1L)
-
-  mname <- names(res$estimates)
-  expect_true(is.character(mname))
-  expect_equal(length(mname), 1L)
-  expect_true(nzchar(mname))
-
-  expect_true(is.numeric(res$estimates[[mname]]))
-  expect_equal(length(res$estimates[[mname]]), 1L)
+  expect_named(
+    res,
+    c("estimate", "results", "repeats_done", "K", "K_required", "method", "plan")
+  )
+  expect_true(is.numeric(res$estimate))
+  expect_equal(length(res$estimate), 1L)
+  expect_named(res$results, c("values", "errors"))
+  expect_equal(length(res$results$values), 2L)
 
   # repetitions and K are as requested
-  expect_equal(res$repeats_done[[mname]], 2L)
+  expect_equal(res$repeats_done, 2L)
   expect_equal(res$K, 2L)
 })
 
@@ -193,21 +192,18 @@ test_that("predict mode returns a predictor function", {
     repeats = 2,
     eval_fold = 0L,
     mode = "predict",
-    fold_allocation = "independence"
-  )
-
-  res_pred <- crossfit_multi(
-    data    = dat,
-    methods = list(pred = m_pred),
+    fold_allocation = "independence",
     aggregate_panels  = mean_predictor,
     aggregate_repeats = mean_predictor
   )
 
-  # In predict mode, estimates$pred should be a prediction function
-  expect_true(is.function(res_pred$estimates$pred))
+  res_pred <- crossfit(dat, m_pred)
+
+  # In predict mode, estimate should be a prediction function
+  expect_true(is.function(res_pred$estimate))
 
   newdata <- data.frame(x = seq(-1, 1, length.out = 5))
-  vals <- res_pred$estimates$pred(newdata)
+  vals <- res_pred$estimate(newdata)
   expect_type(vals, "double")
   expect_length(vals, nrow(newdata))
 })

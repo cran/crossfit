@@ -5,8 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Introduction to crossfit}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: 72
 ---
 
@@ -15,9 +15,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment  = "#>"
 )
+library(crossfit)
+set.seed(1)
 ```
-
-library(crossfit) set.seed(1)
 
 # 1. Motivation: why another cross-fitting engine?
 
@@ -46,7 +46,7 @@ observations**, we usually:
 The `crossfit` package generalizes this logic to:
 
 -   an arbitrary **DAG of nuisances**,
--   multiple methods in parallel,
+-   multiple methods in the same run,
 -   flexible fold geometry (per-node `train_fold`, per-target
     `eval_fold`),
 -   two modes: `"estimate"` (numeric target) and `"predict"`
@@ -126,8 +126,8 @@ Conceptually:
 
 -   `folds` and `repeats` define **K-fold cross-fitting repeated R
     times**,
--   `eval_fold` tells how many folds to reserve for evaluating the
-    target,
+-   `eval_fold` specifies the width, in folds, of the target's
+    evaluation window,
 -   `mode` controls whether we return a **numeric estimate**
     (`"estimate"`) or a **prediction function** (`"predict"`),
 -   `fold_allocation` controls how training windows are laid out across
@@ -155,21 +155,21 @@ and the method `mse_method`.
 ``` r
 res <- crossfit(data, mse_method)
 
-str(res$estimates)
-res$estimates[[1]]
+str(res$estimate)
+res$estimate
 ```
 
 The result is a list with elements:
 
--   `estimates` – one entry per method (here only one),
--   `per_method` – panel-wise and repetition-wise values and errors,
+-   `estimate` – the final estimate (or prediction function),
+-   `results` – repetition-wise values and error traces,
 -   `repeats_done` – how many repetitions successfully ran,
--   `K`, `K_required`, `methods`, `plan` – extra diagnostics.
+-   `K`, `K_required`, `method`, `plan` – extra diagnostics.
 
 We can inspect the per-repetition values:
 
 ``` r
-res$per_method$method$values
+res$results$values
 ```
 
 Each element in `values` is the aggregated MSE over panels for that
@@ -299,7 +299,9 @@ m_ens <- create_method(
   repeats       = 3,
   eval_fold     = 0, # no eval window in predict mode
   mode          = "predict",
-  fold_allocation   = "independence"
+  fold_allocation   = "independence",
+  aggregate_panels  = mean_predictor,
+  aggregate_repeats = mean_predictor
 )
 ```
 
@@ -307,15 +309,10 @@ Run cross-fitting in predict mode, using `mean_predictor()` to aggregate
 panel-level and repetition-level predictors:
 
 ``` r
-res_pred <- crossfit_multi(
-  data = data2,
-  methods = list(ensemble = m_ens),
-  aggregate_panels = mean_predictor,
-  aggregate_repeats = mean_predictor
-)
+res_pred <- crossfit(data2, m_ens)
 
-# estimates$ensemble is now a prediction function
-f_hat <- res_pred$estimates$ensemble
+# estimate is now a prediction function
+f_hat <- res_pred$estimate
 
 newdata <- data.frame(x = seq(-2, 2, length.out = 7))
 cbind(x = newdata$x, y_hat = f_hat(newdata))
@@ -342,7 +339,7 @@ relative to the evaluation window.
 
 For each method:
 
--   `eval_fold` folds are reserved for evaluating the target,
+-   the target's evaluation window contains `eval_fold` folds,
 -   each nuisance has a `train_fold` width,
 -   `fold_allocation` decides how the training blocks for nuisances
     occupy the K folds.
@@ -416,7 +413,7 @@ res_grouped <- crossfit(
   fold_split = fold_split_grouped
 )
 
-res_grouped$estimates[[1]]
+res_grouped$estimate
 ```
 
 The only requirement is that `fold_split(data, K)` returns a vector of
@@ -451,15 +448,51 @@ m_trim <- create_method(
 )
 
 res_trim <- crossfit(data, m_trim)
-res_trim$estimates[[1]]
+res_trim$estimate
 ```
+
+## 7.3 Failure handling
+
+Failure handling is configured for each method:
+
+``` r
+default_failure_control <- crossfit_failure_control()
+```
+
+By default, the first panel error fails the current repetition. To attempt all
+panels and pass failed panel results as `NA_real_` to the panel aggregator, set
+`fail_repetition_on_error = FALSE`:
+
+``` r
+available_mean <- function(xs) mean(unlist(xs), na.rm = TRUE)
+
+m_available <- create_method(
+  target        = target_mse,
+  list_nuisance = list(nuis_y = nuis_y),
+  folds         = 4,
+  repeats       = 5,
+  eval_fold     = 1L,
+  mode          = "estimate",
+  fold_allocation   = "independence",
+  aggregate_panels  = available_mean,
+  aggregate_repeats = available_mean,
+  failure_control = crossfit_failure_control(
+    fail_repetition_on_error = FALSE
+  )
+)
+```
+
+Set `prune_on_shared_fit_failure = TRUE` to skip a method when a structurally
+identical nuisance fit has already failed in the same repetition.
+`max_failed_repetitions` sets how many failed repetitions are allowed before
+the method is disabled.
 
 # 8. Where to go next
 
 -   Use `?crossfit`, `?crossfit_multi`, `?create_method`,
     `?create_nuisance` for detailed argument reference.
 
--   Explore the `per_method` and `plan` components in the result if you
+-   Explore `results` (or `per_method` from `crossfit_multi()`) and `plan` if you
     need to:
 
     -   debug dependency graphs,
